@@ -169,9 +169,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d634692f1fcfdb43a82a4155814700a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  missionText: {fileID: 0}
-  completeMissionButton: {fileID: 0}
-  initialMissions: []
+  missionText: {fileID: 901343223}
+  completeMissionButton: {fileID: 1979743114}
+  initialMissions:
+  - 
+  - 
+  - 
 --- !u!114 &280014681
 MonoBehaviour:
   m_ObjectHideFlags: 0
