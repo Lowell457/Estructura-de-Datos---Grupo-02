@@ -5,22 +5,22 @@ using UnityEngine;
 
     public interface ISimpleList<T>
     {
-        //Debe dar acceso al elemento en el indice "index" de la lista
+        //Must give access to element at the given "index" of the list 
         public T this[int index] { get; set; }
 
-        //Debe indicar la cantidad de elementos guardados en la lista
+        //Must indicate the amount of elements saved in the list
         public int Count { get; }
 
-        //Debe agregar "item" al final de la lista
+        //Must add "item" at the end of the list
         public void Add(T item);
 
-        //Debe agregar todos los elementos de "collection" al final de la lista
+        //Must add all elemens of the "collection" to the end of the list
         public void AddRange(T[] collection);
 
-        //Debe remover el primer elemento que sea igual a "item"
-        //Tambien devolver true si se pudo borrar un elemento, false si no
+        //Must remove the first element that's the same as "item"
+        //Also must return true if an element could be removed, false if not
         public bool Remove(T item);
 
-        //Debe limpiar toda la lista
+        //Must wipe the entire list
         public void Clear();
     }

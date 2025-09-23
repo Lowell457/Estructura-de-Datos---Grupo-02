@@ -13,8 +13,8 @@ public class MyQueue<T>
         public Node(T data) { Data = data; }
     }
 
-    private Node head; // primer elemento (front)
-    private Node tail; // último elemento (rear)
+    private Node head; // first element (front)
+    private Node tail; // last element (rear)
     private int count;
 
     public int Count => count;

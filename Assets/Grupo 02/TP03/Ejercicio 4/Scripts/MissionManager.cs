@@ -7,17 +7,17 @@ using TMPro;
 public class MissionManager : MonoBehaviour
 {
     [Header("UI References")]
-    [SerializeField] private TMP_Text missionText; // asignar en Inspector
-    [SerializeField] private Button completeMissionButton; // asignar en Inspector
+    [SerializeField] private TMP_Text missionText; // assign in the Inspector
+    [SerializeField] private Button completeMissionButton; // assign in the Inspector
 
     [Header("Misiones Iniciales")]
-    [SerializeField] private List<string> initialMissions = new List<string>(); // aparecerá en el Inspector
+    [SerializeField] private List<string> initialMissions = new List<string>(); // will appear in the Inspector
 
     private MyQueue<string> missionQueue = new MyQueue<string>();
 
     void Start()
     {
-        // Cargar misiones desde la lista al MyQueue
+        // Load missions from List MyQueue
         foreach (var mission in initialMissions)
         {
             missionQueue.Enqueue(mission);

@@ -378,7 +378,7 @@ MonoBehaviour:
   missionText: {fileID: 901343223}
   completeMissionButton: {fileID: 1979743114}
   initialMissions:
-  - ve con el rey
+  - Ve con el rey
   - Consigue la espada legendaria
   - Derrota al Dragon
 --- !u!4 &352342172

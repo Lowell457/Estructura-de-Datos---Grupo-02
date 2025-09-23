@@ -11,34 +11,34 @@ public class AdvancedUndoController : MonoBehaviour
 
     void Update()
     {
-        // Guardamos estado previo antes de cualquier acción
+        // Save previous state before any action
         Vector3 prevPos = transform.position;
         Quaternion prevRot = transform.rotation;
         Vector3 prevScale = transform.localScale;
         bool actionPerformed = false;
 
-        // Movimiento
+        // Movement
         if (Input.GetKeyDown(KeyCode.UpArrow)) { transform.position += Vector3.up * moveAmount; actionPerformed = true; }
         if (Input.GetKeyDown(KeyCode.DownArrow)) { transform.position += Vector3.down * moveAmount; actionPerformed = true; }
         if (Input.GetKeyDown(KeyCode.LeftArrow)) { transform.position += Vector3.left * moveAmount; actionPerformed = true; }
         if (Input.GetKeyDown(KeyCode.RightArrow)) { transform.position += Vector3.right * moveAmount; actionPerformed = true; }
 
-        // Rotación
+        // Rotation
         if (Input.GetKeyDown(KeyCode.Q)) { transform.Rotate(Vector3.forward, rotationAmount); actionPerformed = true; }
         if (Input.GetKeyDown(KeyCode.E)) { transform.Rotate(Vector3.forward, -rotationAmount); actionPerformed = true; }
 
-        // Escala
+        // Scale
         if (Input.GetKeyDown(KeyCode.W)) { transform.localScale += Vector3.one * scaleAmount; actionPerformed = true; }
         if (Input.GetKeyDown(KeyCode.S)) { transform.localScale -= Vector3.one * scaleAmount; actionPerformed = true; }
 
-        // Guardar acción en la pila
+        // Save action int the pile
         if (actionPerformed)
         {
             ActionType type = DetermineActionType(prevPos, prevRot, prevScale);
             undoStack.Push(new ActionRecord(type, prevPos, prevRot, prevScale));
         }
 
-        // Undo con Z
+        // Undo with Z
         if (Input.GetKeyDown(KeyCode.Z))
         {
             if (undoStack.TryPop(out ActionRecord action))

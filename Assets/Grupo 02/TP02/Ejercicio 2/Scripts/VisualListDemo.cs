@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using TMPro;
-using MyLinkedList; // Usar tu implementación MyList
+using MyLinkedList; // Use own MyList implementation
 
 public class VisualListDemo : MonoBehaviour
 {
@@ -11,9 +11,9 @@ public class VisualListDemo : MonoBehaviour
     public TMP_Dropdown typeDropdown; // "String", "Int", "Float"
 
     [Header("Visual Nodes")]
-    public GameObject nodePrefab; // Prefab con un círculo/cuadro + TextMeshPro
-    public Transform nodesParent; // Contenedor donde se instancian
-    public float spacing = 2.5f;  // Espaciado entre nodos
+    public GameObject nodePrefab; // Prefab with a square/circle + TextMeshPro
+    public Transform nodesParent; // Container where prefabs are created
+    public float spacing = 2.5f;  // Spacing between nodes
 
     private MyList<string> stringList;
     private MyList<int> intList;
@@ -59,7 +59,7 @@ public class VisualListDemo : MonoBehaviour
     }
 
     // =========================
-    // BOTONES
+    // BUTTONS
     // =========================
     public void AddItem()
     {
@@ -105,15 +105,15 @@ public class VisualListDemo : MonoBehaviour
     }
 
     // =========================
-    // RENDERIZADO VISUAL
+    // VISUAL RENDERING
     // =========================
     private void UpdateDisplay()
     {
-        // Limpia nodos visuales viejos
+        // Wipes old visual nodes
         foreach (Transform child in nodesParent)
             Destroy(child.gameObject);
 
-        // Dibuja nodos según el tipo actual
+        // Draws nodes according to current type
         switch (currentType)
         {
             case ListType.String: DrawList(stringList); displayText.text = stringList.ToString(); break;
@@ -129,7 +129,7 @@ public class VisualListDemo : MonoBehaviour
             GameObject node = Instantiate(nodePrefab, nodesParent);
             node.transform.localPosition = new Vector3(i * spacing, 0, 0);
 
-            TextMeshPro tmp = node.GetComponentInChildren<TextMeshPro>();
+            TextMeshProUGUI tmp = node.GetComponentInChildren<TextMeshProUGUI>();
             if (tmp != null) tmp.text = list[i].ToString();
         }
     }

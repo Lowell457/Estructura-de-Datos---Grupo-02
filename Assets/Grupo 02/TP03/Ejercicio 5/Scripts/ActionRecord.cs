@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Tipo de acción posible
+// possible action tipes
 public enum ActionType { Move, Rotate, Scale }
 
-// Registro de cada acción
+// registers of every action
 public class ActionRecord
 {
     public ActionType Type;
