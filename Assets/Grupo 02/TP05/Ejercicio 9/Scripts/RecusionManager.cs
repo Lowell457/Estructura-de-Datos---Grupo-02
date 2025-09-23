@@ -86,7 +86,7 @@ public class RecusionManager : MonoBehaviour
     private int Sum(int n)
     {
         if (n <= 0) return 0;
-        return n + Sum(n - 1);
+        return (n - 1) + Sum(n - 1);
     }
 
     private string BuildPyramid(int height, int current = 1)

@@ -1,118 +1,136 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
-using MyLinkedList; // tu namespace con MyList y MyNode
+using TMPro;
+using MyLinkedList; // Usar tu implementación MyList
 
 public class VisualListDemo : MonoBehaviour
 {
-    public GameObject circlePrefab; // Prefab del círculo (arrastrar en Inspector)
-    private MyList<GameObject> objetos = new MyList<GameObject>();
+    [Header("UI")]
+    public TMP_InputField inputField;
+    public TextMeshProUGUI displayText;
+    public TMP_Dropdown typeDropdown; // "String", "Int", "Float"
 
-    private int currentIndex = 0; // índice actual
+    [Header("Visual Nodes")]
+    public GameObject nodePrefab; // Prefab con un círculo/cuadro + TextMeshPro
+    public Transform nodesParent; // Contenedor donde se instancian
+    public float spacing = 2.5f;  // Espaciado entre nodos
+
+    private MyList<string> stringList;
+    private MyList<int> intList;
+    private MyList<float> floatList;
+
+    private enum ListType { String = 0, Int = 1, Float = 2 }
+    private ListType currentType = ListType.String;
 
     void Start()
     {
-        // Crear algunos objetos de arranque
-        for (int i = 0; i < 5; i++)
-        {
-            AddObject();
-        }
+        stringList = new MyList<string>();
+        intList = new MyList<int>();
+        floatList = new MyList<float>();
 
-        HighlightCurrent();
+        typeDropdown.onValueChanged.RemoveAllListeners();
+        typeDropdown.onValueChanged.AddListener(OnTypeChanged);
+        typeDropdown.value = 0;
+
+        UpdateInputFieldContentType();
+        UpdateDisplay();
     }
 
-    void Update()
+    private void OnTypeChanged(int index)
     {
-        // Mover derecha
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        currentType = (ListType)index;
+        inputField.text = "";
+        UpdateInputFieldContentType();
+        UpdateDisplay();
+    }
+
+    private void UpdateInputFieldContentType()
+    {
+        switch (currentType)
         {
-            if (currentIndex < objetos.Count - 1)
-            {
-                currentIndex++;
-                HighlightCurrent();
-            }
+            case ListType.String:
+                inputField.contentType = TMP_InputField.ContentType.Standard; break;
+            case ListType.Int:
+                inputField.contentType = TMP_InputField.ContentType.IntegerNumber; break;
+            case ListType.Float:
+                inputField.contentType = TMP_InputField.ContentType.DecimalNumber; break;
+        }
+        inputField.ForceLabelUpdate();
+    }
+
+    // =========================
+    // BOTONES
+    // =========================
+    public void AddItem()
+    {
+        string text = inputField.text;
+        if (string.IsNullOrWhiteSpace(text)) return;
+
+        switch (currentType)
+        {
+            case ListType.String: stringList.Add(text); break;
+            case ListType.Int: if (int.TryParse(text, out int i)) intList.Add(i); break;
+            case ListType.Float: if (float.TryParse(text, out float f)) floatList.Add(f); break;
         }
 
-        // Mover izquierda
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        inputField.text = "";
+        UpdateDisplay();
+    }
+
+    public void RemoveItem()
+    {
+        string text = inputField.text;
+        if (string.IsNullOrWhiteSpace(text)) return;
+
+        switch (currentType)
         {
-            if (currentIndex > 0)
-            {
-                currentIndex--;
-                HighlightCurrent();
-            }
+            case ListType.String: stringList.Remove(text); break;
+            case ListType.Int: if (int.TryParse(text, out int i)) intList.Remove(i); break;
+            case ListType.Float: if (float.TryParse(text, out float f)) floatList.Remove(f); break;
         }
 
-        // Agregar un nuevo nodo al final
-        if (Input.GetKeyDown(KeyCode.A))
+        inputField.text = "";
+        UpdateDisplay();
+    }
+
+    public void ClearList()
+    {
+        switch (currentType)
         {
-            AddObject();
-            currentIndex = objetos.Count - 1; // mover al nuevo
-            HighlightCurrent();
+            case ListType.String: stringList.Clear(); break;
+            case ListType.Int: intList.Clear(); break;
+            case ListType.Float: floatList.Clear(); break;
         }
+        UpdateDisplay();
+    }
 
-        // Eliminar nodo actual
-        if (Input.GetKeyDown(KeyCode.R))
+    // =========================
+    // RENDERIZADO VISUAL
+    // =========================
+    private void UpdateDisplay()
+    {
+        // Limpia nodos visuales viejos
+        foreach (Transform child in nodesParent)
+            Destroy(child.gameObject);
+
+        // Dibuja nodos según el tipo actual
+        switch (currentType)
         {
-            if (!objetos.IsEmpty())
-            {
-                GameObject toRemove = objetos[currentIndex];
-                objetos.RemoveAt(currentIndex);
-
-                if (toRemove != null) Destroy(toRemove);
-
-                // Ajustar índice
-                if (currentIndex >= objetos.Count) currentIndex = objetos.Count - 1;
-
-                HighlightCurrent();
-            }
+            case ListType.String: DrawList(stringList); displayText.text = stringList.ToString(); break;
+            case ListType.Int: DrawList(intList); displayText.text = intList.ToString(); break;
+            case ListType.Float: DrawList(floatList); displayText.text = floatList.ToString(); break;
         }
     }
 
-    void AddObject()
+    private void DrawList<T>(MyList<T> list)
     {
-        int i = objetos.Count;
-        Vector2 pos = new Vector2(i * 2 - 4, 0); // separarlos en línea
-        GameObject obj = Instantiate(circlePrefab, pos, Quaternion.identity);
-        objetos.Add(obj);
-    }
-
-    void HighlightCurrent()
-    {
-        // Resetear todos a blanco
-        for (int i = 0; i < objetos.Count; i++)
+        for (int i = 0; i < list.Count; i++)
         {
-            GameObject obj = objetos[i];
-            if (obj != null)
-            {
-                SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
-                sr.color = Color.white;
-            }
+            GameObject node = Instantiate(nodePrefab, nodesParent);
+            node.transform.localPosition = new Vector3(i * spacing, 0, 0);
+
+            TextMeshPro tmp = node.GetComponentInChildren<TextMeshPro>();
+            if (tmp != null) tmp.text = list[i].ToString();
         }
-
-        // Resaltar el actual
-        if (!objetos.IsEmpty() && currentIndex >= 0)
-        {
-            GameObject actual = objetos[currentIndex];
-            if (actual != null)
-            {
-                SpriteRenderer sr = actual.GetComponent<SpriteRenderer>();
-                sr.color = Color.red;
-            }
-        }
-    }
-
-    // Mostrar info en pantalla
-    void OnGUI()
-    {
-        GUIStyle style = new GUIStyle();
-        style.fontSize = 24;
-        style.normal.textColor = Color.black;
-
-        string info = $"Índice actual: {currentIndex} / {objetos.Count - 1}\n" +
-                      $"Total de elementos: {objetos.Count}\n" +
-                      $"Controles: ← → moverse | A agregar | R eliminar";
-
-        GUI.Label(new Rect(10, 10, 500, 100), info, style);
     }
 }
