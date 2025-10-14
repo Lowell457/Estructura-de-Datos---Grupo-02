@@ -55,7 +55,7 @@ public class MyABBTree
     }
 
     // ----------------- Visualización de nodo -----------------
-    private void CreateVisualNode(MyABBNode node)
+    protected void CreateVisualNode(MyABBNode node)
     {
         if (nodePrefab == null) return;
 
