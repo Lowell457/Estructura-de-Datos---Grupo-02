@@ -34,8 +34,16 @@ public class SpaceMapManager : MonoBehaviour
     /// Called when a planet is clicked in the scene.
     public void OnPlanetClicked(PlanetNode node)
     {
-        if (!selectedPlanets.Contains(node.planetName))
+        if (selectedPlanets.Contains(node.planetName))
+        {
+            // Deselect it
+            selectedPlanets.Remove(node.planetName);
+        }
+        else
+        {
+            // Select it
             selectedPlanets.Add(node.planetName);
+        }
 
         UpdateUI();
     }

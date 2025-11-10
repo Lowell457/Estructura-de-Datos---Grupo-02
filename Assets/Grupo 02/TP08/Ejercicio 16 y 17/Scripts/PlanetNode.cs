@@ -7,7 +7,6 @@ public class PlanetNode : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("Clicked planet: " + planetName);
         SpaceMapManager.Instance.OnPlanetClicked(this);
     }
 }

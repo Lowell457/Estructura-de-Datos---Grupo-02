@@ -20,7 +20,7 @@ public class ABBVisualizer : MonoBehaviour
         // ----------------- Posicionar nodos en pantalla -----------------
         float xMin = -10f;
         float xMax = 10f;
-        float yStart = 5f;
+        float yStart = 4f;
         PositionNode(tree.Root, xMin, xMax, yStart);
 
         // ----------------- Dibujar líneas -----------------

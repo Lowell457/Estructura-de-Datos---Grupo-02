@@ -31,12 +31,28 @@ public class InventoryManager : MonoBehaviour
 
     public void ShowUniqueItems()
     {
-        var unique = player1.items
-            .Union(player2.items)
-            .Except(player1.items.Intersect(player2.items))
-            .ToList();
-        ShowResult("Ítems que NO comparten:", unique);
+        // Items only Player 1 has
+        var uniqueToP1 = player1.items.Except(player2.items).ToList();
+
+        // Items only Player 2 has
+        var uniqueToP2 = player2.items.Except(player1.items).ToList();
+
+        // Build text output
+        string result = "Ítems únicos de Jugador 1:\n";
+        if (uniqueToP1.Count > 0)
+            result += string.Join("\n", uniqueToP1.Select(i => i.ToString()));
+        else
+            result += "(Ninguno)\n";
+
+        result += "\n\nÍtems únicos de Jugador 2:\n";
+        if (uniqueToP2.Count > 0)
+            result += string.Join("\n", uniqueToP2.Select(i => i.ToString()));
+        else
+            result += "(Ninguno)";
+
+        resultText.text = result;
     }
+
 
     public void ShowMissingItems()
     {

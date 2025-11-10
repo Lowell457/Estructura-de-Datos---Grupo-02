@@ -23,7 +23,7 @@ public class GridManager : MonoBehaviour
 
     void GenerateGrid()
     {
-        // Limpia hijos previos (si re-generate)
+        // Wipes old tiles
         for (int i = transform.childCount - 1; i >= 0; i--)
             DestroyImmediate(transform.GetChild(i).gameObject);
 
@@ -36,16 +36,17 @@ public class GridManager : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                // posición local relativa al GridManager
-                Vector3 localPos = new Vector3(x * tileSize - xOffset, y * tileSize - yOffset, 0f);
+                // local position related to GridManager
+                float spacing = 0.1f;
+                Vector3 localPos = new Vector3(x * (tileSize + spacing) - xOffset, y * (tileSize + spacing) - yOffset, 0f);
 
-                // Instancia como hijo sin intentar fijar world position
+                // Instantiate as child without trying to set world position
                 GameObject obj = Instantiate(tilePrefab, transform);
 
-                // Asegura que el objeto instanciado tenga el transform limpio
+                // Makes sure the instantiated  object has Transform empty 
                 obj.transform.localPosition = localPos;
                 obj.transform.localRotation = Quaternion.identity;
-                obj.transform.localScale = Vector3.one; // evita escalados indeseados heredados
+                obj.transform.localScale = Vector3.one; // avoids unwanted inherited escalations
 
                 obj.name = $"Tile_{x}_{y}";
 
