@@ -24,9 +24,15 @@ public class SpaceMapManager : MonoBehaviour
     {
         graph.AddEdge("Earth", ("Mars", 5));
         graph.AddEdge("Earth", ("Venus", 8));
+        graph.AddEdge("Mars", ("Earth", 5));
         graph.AddEdge("Mars", ("Jupiter", 3));
+        graph.AddEdge("Mars", ("Venus", 2));
         graph.AddEdge("Venus", ("Mercury", 4));
+        graph.AddEdge("Venus", ("Earth", 8));
+        graph.AddEdge("Mercury", ("Venus", 4));
         graph.AddEdge("Jupiter", ("Saturn", 10));
+        graph.AddEdge("Jupiter", ("Mars", 3));
+        graph.AddEdge("Saturn", ("Jupiter", 10));
 
         Debug.Log("Graph initialized with vertices: " + string.Join(", ", graph.Vertices));
     }
