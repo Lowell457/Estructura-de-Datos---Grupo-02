@@ -4,32 +4,38 @@ using TMPro;
 
 public class Inventory : MonoBehaviour
 {
-    public Transform slotContainer;   // Asigná aquí el GameObject "ItemContainer"
+    public Transform slotContainer;
     private TextMeshProUGUI[] slotTexts;
 
-    public HashSet<Item> items = new HashSet<Item>();
+    // Unique items
+    public HashSet<Item> uniqueItems = new HashSet<Item>();
+
+    // Actual slot contents 
+    public LinkedList<Item> slotItems = new LinkedList<Item>();
 
     private void Awake()
     {
-        // Busca automáticamente todos los TMP_Text dentro del contenedor
         slotTexts = slotContainer.GetComponentsInChildren<TextMeshProUGUI>();
     }
 
-    public void InitializeInventory(List<Item> allItems)
+    public void InitializeInventory(LinkedList<Item> allItems)
     {
-        items.Clear();
+        uniqueItems.Clear();
+        slotItems.Clear();
 
-        // Limpia el texto de cada slot
         foreach (var text in slotTexts)
             text.text = "";
 
-        // 70% de chance de llenar un slot
+        Item[] arr = new Item[allItems.Count];
+        allItems.CopyTo(arr, 0);
+
         for (int i = 0; i < slotTexts.Length; i++)
         {
             if (Random.value <= 0.7f)
             {
-                Item randomItem = allItems[Random.Range(0, allItems.Count)];
-                items.Add(randomItem);
+                Item randomItem = arr[Random.Range(0, arr.Length)];
+                slotItems.AddLast(randomItem);         // track actual slot
+                uniqueItems.Add(randomItem);           // track uniqueness
                 slotTexts[i].text = randomItem.name;
             }
         }

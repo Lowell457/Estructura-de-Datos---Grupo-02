@@ -9,65 +9,71 @@ public class InventoryManager : MonoBehaviour
     public Inventory player2;
     public TMP_Text resultText;
 
-    private List<Item> allItems;
+    private LinkedList<Item> allItems;
 
     void Start()
     {
-        // Genereate 40 unique items
-        allItems = new List<Item>();
+        // Create 40 items in a linked list
+        allItems = new LinkedList<Item>();
         for (int i = 0; i < 40; i++)
-            allItems.Add(new Item($"Item {i+1}", Random.Range(10f, 200f)));
+            allItems.AddLast(new Item($"Item {i + 1}", Random.Range(10f, 200f)));
 
-        // Initialize both inventories
         player1.InitializeInventory(allItems);
         player2.InitializeInventory(allItems);
     }
 
+    // SHOW COMMON ITEMS (unique items only)
     public void ShowCommonItems()
     {
-        var common = player1.items.Intersect(player2.items).ToList();
+        var common = player1.uniqueItems
+            .Intersect(player2.uniqueItems)
+            .ToList();
+
         ShowResult("Ítems en común:", common);
     }
 
+    // SHOW UNIQUE ITEMS PER PLAYER
     public void ShowUniqueItems()
     {
-        // Items only Player 1 has
-        var uniqueToP1 = player1.items.Except(player2.items).ToList();
+        var uniqueToP1 = player1.uniqueItems.Except(player2.uniqueItems).ToList();
+        var uniqueToP2 = player2.uniqueItems.Except(player1.uniqueItems).ToList();
 
-        // Items only Player 2 has
-        var uniqueToP2 = player2.items.Except(player1.items).ToList();
-
-        // Build text output
         string result = "Ítems únicos de Jugador 1:\n";
-        if (uniqueToP1.Count > 0)
-            result += string.Join("\n", uniqueToP1.Select(i => i.ToString()));
-        else
-            result += "(Ninguno)\n";
+        result += uniqueToP1.Count > 0
+            ? string.Join("\n", uniqueToP1.Select(i => i.ToString()))
+            : "(Ninguno)\n";
 
         result += "\n\nÍtems únicos de Jugador 2:\n";
-        if (uniqueToP2.Count > 0)
-            result += string.Join("\n", uniqueToP2.Select(i => i.ToString()));
-        else
-            result += "(Ninguno)";
+        result += uniqueToP2.Count > 0
+            ? string.Join("\n", uniqueToP2.Select(i => i.ToString()))
+            : "(Ninguno)";
 
         resultText.text = result;
     }
 
-
+    // SHOW ITEMS THAT NEITHER PLAYER HAS
     public void ShowMissingItems()
     {
-        var allNames = new HashSet<Item>(allItems);
-        var owned = player1.items.Union(player2.items);
-        var missing = allNames.Except(owned).ToList();
+        // unique set of all items
+        var allSet = new HashSet<Item>(allItems);
+
+        // union of both inventories' unique sets
+        var owned = new HashSet<Item>(player1.uniqueItems);
+        owned.UnionWith(player2.uniqueItems);
+
+        var missing = allSet.Except(owned).ToList();
         ShowResult("Ítems que ninguno tiene:", missing);
     }
 
+    // SHOW COUNT
     public void ShowCounts()
     {
-        resultText.text = $"Jugador 1: {player1.items.Count} ítems\n" +
-                          $"Jugador 2: {player2.items.Count} ítems";
+        resultText.text =
+            $"Jugador 1: {player1.slotItems.Count} ítems\n" +
+            $"Jugador 2: {player2.slotItems.Count} ítems";
     }
 
+    // PRIVATE HELPER FOR DISPLAY
     private void ShowResult(string title, List<Item> items)
     {
         if (items.Count == 0)
@@ -78,10 +84,11 @@ public class InventoryManager : MonoBehaviour
 
         resultText.text = title + "\n" + string.Join("\n", items.Select(i => i.ToString()));
     }
+
+    // REGENERATE BOTH INVENTORIES
     public void Regenerate()
     {
         player1.InitializeInventory(allItems);
         player2.InitializeInventory(allItems);
     }
-
 }
