@@ -2,134 +2,181 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public class AVLNode
-{
-    public int score;
-    public string playerName;
-    public AVLNode left, right;
-    public int height;
-
-    public AVLNode(int score, string playerName)
-    {
-        this.score = score;
-        this.playerName = playerName;
-        height = 1;
-    }
-}
-
 public class AVLTree
 {
-    public AVLNode root;
+    public NodeTp7 root;
 
-    private int Height(AVLNode n) => n == null ? 0 : n.height;
-    private int GetBalance(AVLNode n) => n == null ? 0 : Height(n.left) - Height(n.right);
-
-    private AVLNode RotateRight(AVLNode y)
-    {
-        AVLNode x = y.left;
-        AVLNode T2 = x.right;
-        x.right = y;
-        y.left = T2;
-        y.height = Mathf.Max(Height(y.left), Height(y.right)) + 1;
-        x.height = Mathf.Max(Height(x.left), Height(x.right)) + 1;
-        return x;
-    }
-
-    private AVLNode RotateLeft(AVLNode x)
-    {
-        AVLNode y = x.right;
-        AVLNode T2 = y.left;
-        y.left = x;
-        x.right = T2;
-        x.height = Mathf.Max(Height(x.left), Height(x.right)) + 1;
-        y.height = Mathf.Max(Height(y.left), Height(y.right)) + 1;
-        return y;
-    }
+    public event Action<NodeTp7> OnNodeCreated;
 
     public void Insert(int score, string playerName)
     {
-        root = Insert(root, score, playerName);
+        root = InsertRecursive(root, score, playerName);
     }
 
-    private AVLNode Insert(AVLNode node, int score, string playerName)
+    private NodeTp7 InsertRecursive(NodeTp7 node, int score, string playerName)
     {
-        if (node == null) return new AVLNode(score, playerName);
-        if (score < node.score)
-            node.left = Insert(node.left, score, playerName);
-        else
-            node.right = Insert(node.right, score, playerName);
+        if (node == null)
+        {
+            var newNode = new NodeTp7(score, playerName);
+            OnNodeCreated?.Invoke(newNode);
+            return newNode;
+        }
 
-        node.height = Mathf.Max(Height(node.left), Height(node.right)) + 1;
+        // Block duplicate names
+        if (node.PlayerName == playerName)
+        {
+            Debug.LogWarning($"Player '{playerName}' already exists. Not inserting.");
+            return node;
+        }
 
-        int balance = GetBalance(node);
-        if (balance > 1 && score < node.left.score) return RotateRight(node);
-        if (balance < -1 && score > node.right.score) return RotateLeft(node);
-        if (balance > 1 && score > node.left.score) { node.left = RotateLeft(node.left); return RotateRight(node); }
-        if (balance < -1 && score < node.right.score) { node.right = RotateRight(node.right); return RotateLeft(node); }
+        // Allow duplicate scores
+        if (score > node.Score)                    
+            node.Left = InsertRecursive(node.Left, score, playerName);
+        else                                        
+            node.Right = InsertRecursive(node.Right, score, playerName);
+
+        UpdateHeight(node);
+
+        return Balance(node);
+    }
+
+
+    // AVL HELPERS 
+
+    private int Height(NodeTp7 n) => n?.Height ?? 0;
+    private void UpdateHeight(NodeTp7 n) =>
+        n.Height = Mathf.Max(Height(n.Left), Height(n.Right)) + 1;
+
+    private int BalanceFactor(NodeTp7 n) =>
+        Height(n.Left) - Height(n.Right);
+
+    private NodeTp7 Balance(NodeTp7 node)
+    {
+        int bf = BalanceFactor(node);
+
+        if (bf > 1)
+        {
+            if (BalanceFactor(node.Left) < 0)
+                node.Left = RotateLeft(node.Left);
+            return RotateRight(node);
+        }
+
+        if (bf < -1)
+        {
+            if (BalanceFactor(node.Right) > 0)
+                node.Right = RotateRight(node.Right);
+            return RotateLeft(node);
+        }
 
         return node;
     }
 
-    // Traversals that return LISTS (for UI)
-    public List<(string, int)> InOrder()
+    private NodeTp7 RotateRight(NodeTp7 y)
     {
-        var result = new List<(string, int)>();
-        InOrder(root, result);
-        return result;
+        NodeTp7 x = y.Left;
+        NodeTp7 T2 = x.Right;
+
+        x.Right = y;
+        y.Left = T2;
+
+        UpdateHeight(y);
+        UpdateHeight(x);
+        return x;
     }
 
-    private void InOrder(AVLNode node, List<(string, int)> list)
+    private NodeTp7 RotateLeft(NodeTp7 x)
     {
-        if (node == null) return;
-        InOrder(node.right, list); // right first for descending
-        list.Add((node.playerName, node.score));
-        InOrder(node.left, list);
+        NodeTp7 y = x.Right;
+        NodeTp7 T2 = y.Left;
+
+        y.Left = x;
+        x.Right = T2;
+
+        UpdateHeight(x);
+        UpdateHeight(y);
+        return y;
     }
 
-    public List<(string, int)> PreOrderList()
+    // LIST TRAVERSALS (FOR UI)
+
+    public List<NodeTp7> InOrder()
     {
-        var list = new List<(string, int)>();
+        List<NodeTp7> list = new();
+        InOrder(root, list);
+        return list;
+    }
+    private void InOrder(NodeTp7 n, List<NodeTp7> list)
+    {
+        if (n == null) return;
+        InOrder(n.Left, list);
+        list.Add(n);
+        InOrder(n.Right, list);
+    }
+
+    public List<NodeTp7> PreOrder()
+    {
+        List<NodeTp7> list = new();
         PreOrder(root, list);
         return list;
     }
-
-    private void PreOrder(AVLNode node, List<(string, int)> list)
+    private void PreOrder(NodeTp7 n, List<NodeTp7> list)
     {
-        if (node == null) return;
-        list.Add((node.playerName, node.score));
-        PreOrder(node.left, list);
-        PreOrder(node.right, list);
+        if (n == null) return;
+        list.Add(n);
+        PreOrder(n.Left, list);
+        PreOrder(n.Right, list);
     }
 
-    public List<(string, int)> PostOrderList()
+    public List<NodeTp7> PostOrder()
     {
-        var list = new List<(string, int)>();
+        List<NodeTp7> list = new();
         PostOrder(root, list);
         return list;
     }
-
-    private void PostOrder(AVLNode node, List<(string, int)> list)
+    private void PostOrder(NodeTp7 n, List<NodeTp7> list)
     {
-        if (node == null) return;
-        PostOrder(node.left, list);
-        PostOrder(node.right, list);
-        list.Add((node.playerName, node.score));
+        if (n == null) return;
+        PostOrder(n.Left, list);
+        PostOrder(n.Right, list);
+        list.Add(n);
     }
 
-    public List<(string, int)> LevelOrderList()
+    public List<NodeTp7> LevelOrder()
     {
-        var list = new List<(string, int)>();
-        if (root == null) return list;
-        Queue<AVLNode> queue = new Queue<AVLNode>();
-        queue.Enqueue(root);
-        while (queue.Count > 0)
+        List<NodeTp7> result = new();
+        if (root == null) return result;
+
+        Queue<NodeTp7> q = new();
+        q.Enqueue(root);
+
+        while (q.Count > 0)
         {
-            var node = queue.Dequeue();
-            list.Add((node.playerName, node.score));
-            if (node.left != null) queue.Enqueue(node.left);
-            if (node.right != null) queue.Enqueue(node.right);
+            var n = q.Dequeue();
+            result.Add(n);
+
+            if (n.Left != null) q.Enqueue(n.Left);
+            if (n.Right != null) q.Enqueue(n.Right);
         }
-        return list;
+
+        return result;
     }
+    
+    // CHECKING FOR DUPLICATE NAMES 
+
+    public bool ContainsName(string name)
+    {
+        return ContainsNameRecursive(root, name);
+    }
+
+    private bool ContainsNameRecursive(NodeTp7 node, string name)
+    {
+        if (node == null) return false;
+
+        if (node.PlayerName.Equals(name, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return ContainsNameRecursive(node.Left, name) ||
+               ContainsNameRecursive(node.Right, name);
+    }
+
 }

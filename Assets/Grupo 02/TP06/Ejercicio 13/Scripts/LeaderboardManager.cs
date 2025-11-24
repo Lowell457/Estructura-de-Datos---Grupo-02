@@ -1,81 +1,126 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using TMPro;
+﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using TMPro;
 
 public class LeaderboardManager : MonoBehaviour
 {
-    [Header("UI References")]
-    public TextMeshProUGUI leaderboardText;
-    public Button addScoreButton;
+    public Transform contentPanel;
+    public GameObject scoreEntryPrefab;
+    public TMP_InputField nameInput;
+    public TMP_InputField scoreInput;
+    public Button addButton;
+
     public Button preOrderButton;
     public Button inOrderButton;
     public Button postOrderButton;
     public Button levelOrderButton;
 
-    private AVLTree tree = new AVLTree();
-    private System.Random rng = new System.Random();
+    public int cantidadScoresAleatorios = 100;
 
-    void Start()
+    private AVLTree avlTree = new AVLTree();
+
+    private enum SortMode { InOrder, PreOrder, PostOrder, LevelOrder }
+    private SortMode currentSort = SortMode.InOrder;
+
+    private void Start()
     {
-        // Create 100 random scores
-        for (int i = 0; i < 100; i++)
+        // SUBSCRIBES HERE
+        avlTree.OnNodeCreated += HandleNodeCreated;
+
+        // random score generation
+        for (int i = 0; i < cantidadScoresAleatorios; i++)
         {
-            int score = rng.Next(0, 1000);
-            string name = "Player" + (i + 1);
-            tree.Insert(score, name);
+            int score = Random.Range(0, 10000);
+            string name = "Player" + Random.Range(1, 999);
+            avlTree.Insert(score, name);
         }
 
-        // Initialize leaderboard
-        UpdateLeaderboardUI(tree.InOrder(), "LEADERBOARD (Sorted)");
+        addButton.onClick.AddListener(AddNewScore);
 
-        // Hook up buttons
-        addScoreButton.onClick.AddListener(AddRandomScore);
-        preOrderButton.onClick.AddListener(() => ShowTraversal("Pre-Order"));
-        inOrderButton.onClick.AddListener(() => ShowTraversal("In-Order"));
-        postOrderButton.onClick.AddListener(() => ShowTraversal("Post-Order"));
-        levelOrderButton.onClick.AddListener(() => ShowTraversal("Level-Order"));
+        preOrderButton.onClick.AddListener(() => {
+            currentSort = SortMode.PreOrder;
+            var list = avlTree.PreOrder();
+            Debug.Log("[PreOrder] " + string.Join(", ", list.ConvertAll(n => $"{n.PlayerName}:{n.Score}")));
+            UpdateUI();
+        });
+        inOrderButton.onClick.AddListener(() => {
+            currentSort = SortMode.InOrder;
+            var list = avlTree.InOrder();
+            Debug.Log("[InOrder] " + string.Join(", ", list.ConvertAll(n => $"{n.PlayerName}:{n.Score}")));
+            UpdateUI();
+        });
+
+        postOrderButton.onClick.AddListener(() => { 
+            currentSort = SortMode.PostOrder; 
+            var list = avlTree.PostOrder();
+            Debug.Log("[PostOrder] " + string.Join(", ", list.ConvertAll(n => $"{n.PlayerName}:{n.Score}")));
+            UpdateUI(); });
+        
+        levelOrderButton.onClick.AddListener(() => { 
+            currentSort = SortMode.LevelOrder; 
+            var list = avlTree.LevelOrder();
+            Debug.Log("[LevelOrder] " + string.Join(", ", list.ConvertAll(n => $"{n.PlayerName}:{n.Score}")));
+            UpdateUI(); });
+
+        UpdateUI();
     }
 
-    void AddRandomScore()
+    private void HandleNodeCreated(NodeTp7 node)
     {
-        int score = rng.Next(0, 1000);
-        string name = "NewPlayer" + rng.Next(1000, 9999);
-        tree.Insert(score, name);
-        Debug.Log($"Added {name} with score {score}");
-
-        UpdateLeaderboardUI(tree.InOrder(), "LEADERBOARD (Sorted)");
+        Debug.Log($"[EVENT] Node created: {node.PlayerName} - {node.Score}");
     }
 
-    void ShowTraversal(string type)
+    private void AddNewScore()
     {
-        List<(string, int)> traversal = new List<(string, int)>();
+        string playerName = nameInput.text;
+        int score = int.Parse(scoreInput.text);
 
-        switch (type)
+        // Checks if name already exists
+        if (avlTree.ContainsName(playerName))
         {
-            case "Pre-Order":
-                traversal = tree.PreOrderList();
-                break;
-            case "In-Order":
-                traversal = tree.InOrder();
-                break;
-            case "Post-Order":
-                traversal = tree.PostOrderList();
-                break;
-            case "Level-Order":
-                traversal = tree.LevelOrderList();
-                break;
+            Debug.LogWarning($"Cannot add score. The name '{playerName}' already exists.");
+            return;
         }
 
-        UpdateLeaderboardUI(traversal, $"{type} Traversal");
+        avlTree.Insert(score, playerName);
+
+        Debug.Log($"[LOG] Added: {playerName} ({score})");
+
+        nameInput.text = "";
+        scoreInput.text = "";
+
+        UpdateUI();
     }
 
-    void UpdateLeaderboardUI(List<(string, int)> scores, string title)
+
+    void UpdateUI()
     {
-        leaderboardText.text = $"{title}\n\n";
-        foreach (var s in scores)
+        // Cleans panels
+        for (int i = contentPanel.childCount - 1; i >= 0; i--)
+            Destroy(contentPanel.GetChild(i).gameObject);
+
+        List<NodeTp7> list;
+
+        switch (currentSort)
         {
-            leaderboardText.text += $"{s.Item1}: {s.Item2}\n";
+            case SortMode.PreOrder: list = avlTree.PreOrder(); break;
+            case SortMode.PostOrder: list = avlTree.PostOrder(); break;
+            case SortMode.LevelOrder: list = avlTree.LevelOrder(); break;
+            default: list = avlTree.InOrder(); break; // Descending order (from biggest to smallest)
+        }
+
+        // Show ALL scores
+        foreach (var node in list)
+        {
+            GameObject entry = Instantiate(scoreEntryPrefab, contentPanel);
+            entry.transform.localScale = Vector3.one;
+
+            TMP_Text txt = entry.GetComponent<TMP_Text>()
+                ?? entry.GetComponentInChildren<TMP_Text>(true);
+
+            if (txt != null)
+                txt.text = $"{node.PlayerName} - {node.Score}";
         }
     }
 }

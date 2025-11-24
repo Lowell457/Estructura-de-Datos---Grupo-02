@@ -39,7 +39,7 @@ public class PlayerMover : MonoBehaviour
     {
         foreach (var tile in path)
         {
-            // Move to the tile’s actual world position, not its grid coords
+            // Move to the tile’s world position
             transform.position = tile.transform.position;
             yield return new WaitForSeconds(moveDelay);
         }

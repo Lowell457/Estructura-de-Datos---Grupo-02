@@ -19,7 +19,7 @@ public class SpaceMapManager : MonoBehaviour
         SetupGraph();
     }
 
-    /// Build the initial graph connections.
+    // Build the initial graph connections.
     void SetupGraph()
     {
         graph.AddEdge("Earth", ("Mars", 5));
@@ -37,7 +37,7 @@ public class SpaceMapManager : MonoBehaviour
         Debug.Log("Graph initialized with vertices: " + string.Join(", ", graph.Vertices));
     }
 
-    /// Called when a planet is clicked in the scene.
+    // Called when a planet is clicked in the scene.
     public void OnPlanetClicked(PlanetNode node)
     {
         if (selectedPlanets.Contains(node.planetName))
@@ -54,7 +54,7 @@ public class SpaceMapManager : MonoBehaviour
         UpdateUI();
     }
 
-    /// Called by the UI Button: checks if the path is valid.
+    // Called by the UI Button: checks if the path is valid.
     public void CheckPath()
     {
         if (selectedPlanets.Count < 2)

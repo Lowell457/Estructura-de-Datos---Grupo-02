@@ -48,7 +48,7 @@ public class Pathfinder : MonoBehaviour
             }
         }
 
-        return null; // sin solución
+        return null; // No solution found
     }
 
     static float Heuristic(Tile a, Tile b)

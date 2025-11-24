@@ -30,14 +30,8 @@ EditorBuildSettings:
     path: Assets/Grupo 02/TP06/Ejercicio 10/Scenes/TP 10.unity
     guid: b8af94b5dbf5fd3439f1245d73f67bab
   - enabled: 1
-    path: Assets/Grupo 02/TP06/Ejercicio 12/Scenes/Ejercicio 12.unity
-    guid: 96b9db96bad82434e8856e175efef225
-  - enabled: 1
-    path: Assets/Grupo 02/TP06/Ejercicio 13/Scenes/Ejercicio 13.unity
-    guid: d15637f4956f84348b1f663fd60ebd2f
-  - enabled: 1
-    path: Assets/Grupo 02/TP07/Ejercicio 14/Scenes/Ejercicio 14.unity
-    guid: 35c471853d2da714a9479ce7bc9545a5
+    path: Assets/Grupo 02/TP06/Ejercicio 13/Scenes/TP07Scene.unity
+    guid: 6e75b6dfb9ae3a44faa940d467145048
   - enabled: 1
     path: Assets/Grupo 02/TP07/Ejercicio 15/Scenes/Ejercicio 15.unity
     guid: 91e5b86563f00b44ba1bdb6586480cf7

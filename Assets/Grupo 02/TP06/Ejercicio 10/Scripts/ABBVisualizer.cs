@@ -1,58 +1,53 @@
 using UnityEngine;
-using TMPro;  // para TextMeshPro
+using TMPro;
 using System.Collections.Generic;
 
-public class ABBVisualizer : MonoBehaviour
+public class UnityABBVisualizer : MonoBehaviour, IABBVisualizer
 {
     public GameObject nodePrefab;
 
-    private MyABBTree tree;
+    private Dictionary<MyABBNode, GameObject> map = new Dictionary<MyABBNode, GameObject>();
+    private List<GameObject> lines = new List<GameObject>();
 
-    void Start()
+    public void CreateVisual(MyABBNode node)
     {
-        // ----------------- Crear ABB -----------------
-        tree = new MyABBTree(nodePrefab);
+        var obj = Instantiate(nodePrefab);
+        obj.name = $"Node_{node.Value}";
 
-        int[] myArray = { 20, 10, 1, 26, 35, 40, 18, 12, 15, 14, 30, 23 };
-        foreach (int v in myArray)
-            tree.Insert(v);
+        var tmp = obj.GetComponentInChildren<TextMeshPro>();
+        if (tmp != null) tmp.text = node.Value.ToString();
 
-        // ----------------- Posicionar nodos en pantalla -----------------
-        float xMin = -10f;
-        float xMax = 10f;
-        float yStart = 4f;
-        PositionNode(tree.Root, xMin, xMax, yStart);
-
-        // ----------------- Dibujar líneas -----------------
-        DrawLines(tree.Root);
-
-        // ----------------- Demostración en consola -----------------
-        Debug.Log("Altura del árbol: " + tree.GetHeight(tree.Root));
-        Debug.Log("Factor de balance (raíz): " + tree.GetBalanceFactor(tree.Root));
-
-        tree.InOrder(tree.Root);
-        tree.PreOrder(tree.Root);
-        tree.PostOrder(tree.Root);
-        tree.LevelOrder(tree.Root);
+        map[node] = obj;
     }
 
-    // ----------------- Posicionamiento ABB -----------------
-    private void PositionNode(MyABBNode node, float xMin, float xMax, float y)
+    public void Redraw(MyABBNode root)
+    {
+        ClearLines();
+
+        float xMin = -10, xMax = 10, yStart = 4f;
+        PositionRecursive(root, xMin, xMax, yStart);
+        DrawLines(root);
+    }
+
+    private void ClearLines()
+    {
+        foreach (var l in lines) Destroy(l);
+        lines.Clear();
+    }
+
+    private void PositionRecursive(MyABBNode node, float xMin, float xMax, float y)
     {
         if (node == null) return;
 
         float x = (xMin + xMax) / 2f;
-
-        if (tree.nodeVisuals.ContainsKey(node))
-            tree.nodeVisuals[node].transform.position = new Vector2(x, y);
+        map[node].transform.position = new Vector2(x, y);
 
         float yOffset = -1.5f;
 
-        PositionNode(node.Left, xMin, x, y + yOffset);
-        PositionNode(node.Right, x, xMax, y + yOffset);
+        PositionRecursive(node.Left, xMin, x, y + yOffset);
+        PositionRecursive(node.Right, x, xMax, y + yOffset);
     }
 
-    // ----------------- Dibujar líneas -----------------
     private void DrawLines(MyABBNode node)
     {
         if (node == null) return;
@@ -66,15 +61,16 @@ public class ABBVisualizer : MonoBehaviour
 
     private void CreateLine(MyABBNode parent, MyABBNode child)
     {
-        GameObject lineObj = new GameObject("Line_" + parent.Value + "_" + child.Value);
-        LineRenderer lr = lineObj.AddComponent<LineRenderer>();
+        var obj = new GameObject($"Line_{parent.Value}_{child.Value}");
+        var lr = obj.AddComponent<LineRenderer>();
+
         lr.positionCount = 2;
-        lr.SetPosition(0, tree.nodeVisuals[parent].transform.position);
-        lr.SetPosition(1, tree.nodeVisuals[child].transform.position);
-        lr.startWidth = 0.05f;
-        lr.endWidth = 0.05f;
+        lr.SetPosition(0, map[parent].transform.position);
+        lr.SetPosition(1, map[child].transform.position);
+        lr.startWidth = lr.endWidth = 0.05f;
         lr.material = new Material(Shader.Find("Sprites/Default"));
-        lr.startColor = Color.white;
-        lr.endColor = Color.white;
+        lr.startColor = lr.endColor = Color.white;
+
+        lines.Add(obj);
     }
 }
