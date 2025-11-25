@@ -41,14 +41,13 @@ public class AVLTree
     }
 
 
-    // AVL HELPERS 
+    // AVL helpers 
 
     private int Height(NodeTp7 n) => n?.Height ?? 0;
-    private void UpdateHeight(NodeTp7 n) =>
-        n.Height = Mathf.Max(Height(n.Left), Height(n.Right)) + 1;
 
-    private int BalanceFactor(NodeTp7 n) =>
-        Height(n.Left) - Height(n.Right);
+    private void UpdateHeight(NodeTp7 n) => n.Height = Mathf.Max(Height(n.Left), Height(n.Right)) + 1;
+
+    private int BalanceFactor(NodeTp7 n) => Height(n.Left) - Height(n.Right);
 
     private NodeTp7 Balance(NodeTp7 node)
     {
@@ -97,7 +96,7 @@ public class AVLTree
         return y;
     }
 
-    // LIST TRAVERSALS (FOR UI)
+    // List traversals (For UI)
 
     public List<NodeTp7> InOrder()
     {
@@ -161,7 +160,7 @@ public class AVLTree
         return result;
     }
     
-    // CHECKING FOR DUPLICATE NAMES 
+    // Checking for duplicate names
 
     public bool ContainsName(string name)
     {

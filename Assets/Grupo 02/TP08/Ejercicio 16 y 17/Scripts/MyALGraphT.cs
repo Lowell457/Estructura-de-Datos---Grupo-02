@@ -44,7 +44,7 @@ public class MyALGraph<T>
         if (!adjacencyList.ContainsKey(edge.to))
             AddVertex(edge.to);
 
-        // Prevent duplicate edges
+        // Prevents duplicate edges
         if (!ContainsEdge(from, edge.to))
             adjacencyList[from].Add(edge);
     }
@@ -58,9 +58,6 @@ public class MyALGraph<T>
             adjacencyList[from].RemoveAll(e => EqualityComparer<T>.Default.Equals(e.Item1, to));
         }
     }
-
-    // Returns true if a vertex exists.
-    public bool ContainsVertex(T vertex) => adjacencyList.ContainsKey(vertex);
 
     // Returns true if an edge exists between two vertices.
     public bool ContainsEdge(T from, T to)

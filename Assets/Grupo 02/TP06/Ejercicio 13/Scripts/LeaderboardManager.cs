@@ -25,7 +25,6 @@ public class LeaderboardManager : MonoBehaviour
 
     private void Start()
     {
-        // SUBSCRIBES HERE
         avlTree.OnNodeCreated += HandleNodeCreated;
 
         // random score generation
@@ -96,7 +95,7 @@ public class LeaderboardManager : MonoBehaviour
 
     void UpdateUI()
     {
-        // Cleans panels
+        // Cleans panel
         for (int i = contentPanel.childCount - 1; i >= 0; i--)
             Destroy(contentPanel.GetChild(i).gameObject);
 

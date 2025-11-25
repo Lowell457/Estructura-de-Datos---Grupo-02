@@ -8,7 +8,7 @@ public class Inventory : MonoBehaviour
     private TextMeshProUGUI[] slotTexts;
 
     // Unique items
-    public HashSet<Item> uniqueItems = new HashSet<Item>();
+    public Set<Item> uniqueItems = new Set<Item>();
 
     // Actual slot contents 
     public LinkedList<Item> slotItems = new LinkedList<Item>();

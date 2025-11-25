@@ -29,6 +29,7 @@ public class SpaceMapManager : MonoBehaviour
         graph.AddEdge("Mars", ("Venus", 2));
         graph.AddEdge("Venus", ("Mercury", 4));
         graph.AddEdge("Venus", ("Earth", 8));
+        graph.AddEdge("Venus", ("Mars", 2));
         graph.AddEdge("Mercury", ("Venus", 4));
         graph.AddEdge("Jupiter", ("Saturn", 10));
         graph.AddEdge("Jupiter", ("Mars", 3));
@@ -42,19 +43,17 @@ public class SpaceMapManager : MonoBehaviour
     {
         if (selectedPlanets.Contains(node.planetName))
         {
-            // Deselect it
             selectedPlanets.Remove(node.planetName);
         }
         else
         {
-            // Select it
             selectedPlanets.Add(node.planetName);
         }
 
         UpdateUI();
     }
 
-    // Called by the UI Button: checks if the path is valid.
+    // Checks if the path is valid.
     public void CheckPath()
     {
         if (selectedPlanets.Count < 2)
